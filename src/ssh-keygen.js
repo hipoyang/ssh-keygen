@@ -1,5 +1,4 @@
 var spawn = require('child_process').spawn;
-var _ = require('underscore');
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
@@ -11,8 +10,8 @@ function binPath() {
 	if(process.platform !== 'win32') return 'ssh-keygen';
 
 	switch(process.arch) {
-		case 'ia32': return path.join(__dirname, '..', 'bin', 'ssh-keygen-32.exe');
-		case 'x64': return path.join(__dirname, '..', 'bin', 'ssh-keygen-64.exe');
+		case 'ia32': return path.join(__dirname, '..', 'bin','32', 'ssh-keygen.exe');
+		case 'x64': return path.join(__dirname, '..', 'bin', '64', 'ssh-keygen.exe');
 	}
 
 	throw new Error('Unsupported platform');
@@ -91,9 +90,9 @@ function ssh_keygen(location, opts, callback){
 							fs.unlink(pubLocation, function(err){
 								if(err) return callback(err);
 								key = key.toString();
-								key = key.substring(0, key.lastIndexOf("\n")).trim();
+								key = key.substring(0, key.lastIndexOf(" \n"));
 								pubKey = pubKey.toString();
-								pubKey = pubKey.substring(0, pubKey.lastIndexOf("\n")).trim();
+								pubKey = pubKey.substring(0, pubKey.lastIndexOf(" \n"));
 								return callback(undefined, {
 									key: key, pubKey: pubKey
 								});
@@ -114,9 +113,9 @@ module.exports = function(opts, callback){
 	var location = opts.location;
 	if(!location) location = path.join(os.tmpdir(),'id_rsa');
 
-	if(_.isUndefined(opts.read)) opts.read = true;
-	if(_.isUndefined(opts.force)) opts.force = true;
-	if(_.isUndefined(opts.destroy)) opts.destroy = false;
+	if(opts.read === undefined) opts.read = true;
+	if(opts.force === undefined) opts.force = true;
+	if(opts.destroy === undefined) opts.destroy = false;
 
 	checkAvailability(location, opts.force, function(err){
 		if(err){
